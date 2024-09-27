@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { learnModalState } from "@/atoms/learnModalAtom";
-import GoalDigger from "./GoalDigger";
+import VictoryTracker from "./VictoryTracker";
+import { victoryModalState } from "@/atoms/victoryModalAtom";
 
-type FormModalProps = {};
+type VictoryFormModalProps = {};
 
-const FormModal: React.FC<FormModalProps> = () => {
-	const formModal = useRecoilValue(learnModalState);
+const VictoryFormModal: React.FC<VictoryFormModalProps> = () => {
 	const closeModal = useCloseModal();
 
 	return (
@@ -28,20 +28,20 @@ const FormModal: React.FC<FormModalProps> = () => {
 								<IoClose className='h-5 w-5' />
 							</button>
 						</div>
-						<GoalDigger />
+						<VictoryTracker />
 					</div>
 				</div>
 			</div>
 		</>
 	);
 };
-export default FormModal;
+export default VictoryFormModal;
 
 function useCloseModal() {
-	const setLearnModal = useSetRecoilState(learnModalState);
+	const setVictoryModal = useSetRecoilState(victoryModalState);
 
 	const closeModal = () => {
-		setLearnModal((prev) => ({ ...prev, isOpen: false, type: "goalDigger" }));
+		setVictoryModal((prev) => ({ ...prev, isOpen: false, type: "victoryTracker" }));
 	};
 
 	useEffect(() => {

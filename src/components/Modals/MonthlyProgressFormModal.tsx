@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { learnModalState } from "@/atoms/learnModalAtom";
-import GoalDigger from "./GoalDigger";
+import { useSetRecoilState } from "recoil";
+import { monthlyProgressModalState } from "@/atoms/monthlyModalAtom";
+import MonthlyProgress from "./MonthlyProgress";
 
-type FormModalProps = {};
+type MonthlyProgressFormModalProps = {};
 
-const FormModal: React.FC<FormModalProps> = () => {
-	const formModal = useRecoilValue(learnModalState);
+const MonthlyProgressFormModal: React.FC<MonthlyProgressFormModalProps> = () => {
 	const closeModal = useCloseModal();
 
 	return (
@@ -28,20 +27,20 @@ const FormModal: React.FC<FormModalProps> = () => {
 								<IoClose className='h-5 w-5' />
 							</button>
 						</div>
-						<GoalDigger />
+						<MonthlyProgress />
 					</div>
 				</div>
 			</div>
 		</>
 	);
 };
-export default FormModal;
+export default MonthlyProgressFormModal;
 
 function useCloseModal() {
-	const setLearnModal = useSetRecoilState(learnModalState);
+	const setMonthlyProgressModal = useSetRecoilState(monthlyProgressModalState);
 
 	const closeModal = () => {
-		setLearnModal((prev) => ({ ...prev, isOpen: false, type: "goalDigger" }));
+		setMonthlyProgressModal((prev) => ({ ...prev, isOpen: false, type: "monthlyProgress" }));
 	};
 
 	useEffect(() => {

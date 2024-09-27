@@ -1,43 +1,40 @@
 import { auth, firestore } from "@/firebase/firebase";
 import { useEffect, useState } from "react";
 import { useAuthState, useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
-import { arrayUnion, doc, runTransaction, setDoc, updateDoc } from "firebase/firestore";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import router from "next/router";
 
-type GoalDiggerProps = {};
+type MonthlyProgressProps = {};
 
-const GoalDigger: React.FC<GoalDiggerProps> = () => {
+const MonthlyProgress: React.FC<MonthlyProgressProps> = () => {
     const [createUserWithEmailAndPassword, loading, error] = useCreateUserWithEmailAndPassword(auth);	const [user] = useAuthState(auth);
-    const [updating, setUpdating] = useState(false);
-    const [inputs, setInputs] = useState({ name: "", skillToLearn: "",  timeRequired: "", reasonToPursue: ""});
+    const [inputs, setInputs] = useState({ skillsAcquired: "", onGoingTasks: "",  submittedAt: ""});
 	const returnUserData = async (transaction: any) => {
 		const userRef = doc(firestore, "users", user!.uid);
 		const userDoc = await transaction.get(userRef);        
 		return { userDoc, userRef };
 	};	
-    const handleSubmitGoalDigger = async(e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmitMonthlyProgress = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const userRef = doc(firestore, "users", user!.uid);
-        if (!inputs.name || !inputs.skillToLearn || !inputs.timeRequired || !inputs.reasonToPursue) return alert(inputs.name);
-        try{
-            if (!user) {
-                toast.error("You must be logged in to submit form.", { position: "top-left", theme: "dark" });
-                return;
-            }
+        if (user==null) {
+			toast.error("You must be logged in to submit form.", { position: "top-left", theme: "dark" });
+			return;
+		}
+        if (!inputs.skillsAcquired || !inputs.onGoingTasks || !inputs.submittedAt ) return alert('Please fill all fields');
+        try{            
             // const dateWiseFormArray = {
             //     submittedAt : Date.now()
             // }
             // await setDoc(doc (firestore, "users", user!.uid),  dateWiseFormArray);
+			const userRef = doc(firestore, "users", user!.uid);
             const newFormData = {
-                name: inputs.name,
-                skillToLearn: inputs.skillToLearn,
-                timeRequired: inputs.timeRequired,
-                reasonToPursue: inputs.reasonToPursue,
+                name: inputs.skillsAcquired,
+                onGoingTasks: inputs.onGoingTasks,
 				submittedAt : Date.now()
             }
             await updateDoc(userRef, {
-                goalDigger: arrayUnion(newFormData)
+                monthlyProgress: arrayUnion(newFormData)
             })
             router.push("/learn");
         }catch (error: any) {
@@ -50,83 +47,38 @@ const GoalDigger: React.FC<GoalDiggerProps> = () => {
 		setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 	};
 
-	const handleSubmit = async () => {
-        if (!inputs.name || !inputs.skillToLearn || !inputs.timeRequired || !inputs.reasonToPursue) return alert("Please fill all fields");
-        console.log('handle submit');
-		if (!user) {
-			toast.error("You must be logged in to submit form.", { position: "top-left", theme: "dark" });
-			return;
-		}
-		if (updating) return;
-		setUpdating(true);
-		await runTransaction(firestore, async (transaction) => {
-			const { userDoc, userRef } = await returnUserData(transaction);
-            if (!userDoc.exists()) {
-                throw "Document does not exist!";
-              }
-
-		});
-		setUpdating(false);
-	}; 
-
 	
 	useEffect(() => {
 		if (error) alert(error);
 	}, [error]);
 
 	return (
-		<form className='space-y-6 px-6 pb-4' onSubmit={handleSubmitGoalDigger}>
-			<h3 className='text-xl font-medium text-white'>Goal Digger Form</h3>
+		<form className='space-y-6 px-6 pb-4' onSubmit={handleSubmitMonthlyProgress}>
+			<h3 className='text-xl font-medium text-white'>Monthly Progress Form</h3>
 			<div>
 				<input
                     onChange={handleChangeInput}
-					type='name'
-					name='name'
-					id='name'
+					type='skillsAcquired'
+					name='skillsAcquired'
+					id='skillsAcquired'
 					className='
         border-2 outline-none sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
         bg-gray-600 border-gray-500 placeholder-gray-400 text-white
     '
-					placeholder='Full Name'
-				/>
-			</div>
-			<div>
-				<input
-                    onChange={handleChangeInput}
-					type='skillToLearn'
-					name='skillToLearn'
-					id='skillToLearn'
-					className='
-        border-2 outline-none sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
-        bg-gray-600 border-gray-500 placeholder-gray-400 text-white
-    '
-					placeholder='Skill to learn'
-				/>
-			</div>
-			<div>
-				<input
-                    onChange={handleChangeInput}
-					type='timeRequired'
-					name='timeRequired'
-					id='timeRequired'
-					className='
-        border-2 outline-none sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
-        bg-gray-600 border-gray-500 placeholder-gray-400 text-white
-    '
-					placeholder='Time Required'
+					placeholder='Skills Acquired'
 				/>
 			</div>
             <div>
 				<input
                     onChange={handleChangeInput}
-					type='reasonToPursue'
-					name='reasonToPursue'
-					id='reasonToPursue'
+					type='onGoingTasks'
+					name='onGoingTasks'
+					id='onGoingTasks'
 					className='
         border-2 outline-none sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
         bg-gray-600 border-gray-500 placeholder-gray-400 text-white
     '
-					placeholder='Why Do you want to pursue?'
+					placeholder=' Ongoing tasks'
 				/>
 			</div>
 
@@ -141,4 +93,4 @@ const GoalDigger: React.FC<GoalDiggerProps> = () => {
 		</form>
 	);
 };
-export default GoalDigger;
+export default MonthlyProgress;

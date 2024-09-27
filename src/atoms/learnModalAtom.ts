@@ -5,12 +5,12 @@ type LearnModalState = {
 	type: "goalDigger" | "victoryTracker" | "monthlyProgress";
 };
 
-const initalLearnModalState: LearnModalState = {
+const initialLearnModalState: LearnModalState = {
 	isOpen: false,
 	type: "goalDigger",
 };
 
 export const learnModalState = atom<LearnModalState>({
 	key: "learnModalState",
-	default: initalLearnModalState,
+	default: initialLearnModalState,
 });

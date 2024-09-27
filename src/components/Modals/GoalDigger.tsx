@@ -18,17 +18,18 @@ const GoalDigger: React.FC<GoalDiggerProps> = () => {
 	};	
     const handleSubmitGoalDigger = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const userRef = doc(firestore, "users", user!.uid);
-        if (!inputs.name || !inputs.skillToLearn || !inputs.timeRequired || !inputs.reasonToPursue) return alert(inputs.name);
+        if(user == null)
+		{
+			toast.error("You must be logged in to submit form.", { position: "top-left", theme: "dark" });
+			return;
+		}
+        if (!inputs.name || !inputs.skillToLearn || !inputs.timeRequired || !inputs.reasonToPursue) return alert('Please fill all fields');
         try{
-            if (!user) {
-                toast.error("You must be logged in to submit form.", { position: "top-left", theme: "dark" });
-                return;
-            }
             // const dateWiseFormArray = {
             //     submittedAt : Date.now()
             // }
             // await setDoc(doc (firestore, "users", user!.uid),  dateWiseFormArray);
+			const userRef = doc(firestore, "users", user!.uid);
             const newFormData = {
                 name: inputs.name,
                 skillToLearn: inputs.skillToLearn,

@@ -17,33 +17,32 @@ const VictoryTracker: React.FC<VictoryTrackerProps> = () => {
 
     const [createUserWithEmailAndPassword, loading, error] = useCreateUserWithEmailAndPassword(auth);	const [user] = useAuthState(auth);
     const [updating, setUpdating] = useState(false);
-    const [inputs, setInputs] = useState({ name: "", skillToLearn: "",  timeRequired: "", reasonToPursue: ""});
+    const [inputs, setInputs] = useState({ date: "", statusUpdate: "",  noOfHours: ""});
 	const returnUserData = async (transaction: any) => {
 		const userRef = doc(firestore, "users", user!.uid);
 		const userDoc = await transaction.get(userRef);        
 		return { userDoc, userRef };
 	};	
-    const handleSubmitGoalDigger = async(e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmitVictoryTracker = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const userRef = doc(firestore, "users", user!.uid);
-        if (!inputs.name || !inputs.skillToLearn || !inputs.timeRequired || !inputs.reasonToPursue) return alert(inputs.name);
-        try{
-            if (!user) {
-                toast.error("You must be logged in to submit form.", { position: "top-left", theme: "dark" });
-                return;
-            }
+        if (user==null) {
+            toast.error("You must be logged in to submit form.", { position: "top-left", theme: "dark" });
+            return;
+        }
+        if (!inputs.date || !inputs.statusUpdate || !inputs.noOfHours ) return alert('Please fill all fields');
+        try{            
             // const dateWiseFormArray = {
             //     submittedAt : Date.now()
             // }
             // await setDoc(doc (firestore, "users", user!.uid),  dateWiseFormArray);
+            const userRef = doc(firestore, "users", user!.uid);
             const newFormData = {
-                name: inputs.name,
-                skillToLearn: inputs.skillToLearn,
-                timeRequired: inputs.timeRequired,
-                reasonToPursue: inputs.reasonToPursue
+                date: new Date(),
+                statusUpdate: inputs.statusUpdate,
+                noOfHours: inputs.noOfHours,
             }
             await updateDoc(userRef, {
-                goalDigger: arrayUnion(newFormData)
+                victoryTracker: arrayUnion(newFormData)
             })
             router.push("/learn");
         }catch (error: any) {
@@ -56,49 +55,15 @@ const VictoryTracker: React.FC<VictoryTrackerProps> = () => {
 		setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 	};
 
-	const handleSubmit = async () => {
-        if (!inputs.name || !inputs.skillToLearn || !inputs.timeRequired || !inputs.reasonToPursue) return alert("Please fill all fields");
-        console.log('handle submit');
-		if (!user) {
-			toast.error("You must be logged in to submit form.", { position: "top-left", theme: "dark" });
-			return;
-		}
-		if (updating) return;
-		setUpdating(true);
-		await runTransaction(firestore, async (transaction) => {
-			const { userDoc, userRef } = await returnUserData(transaction);
-            if (!userDoc.exists()) {
-                throw "Document does not exist!";
-              }
-
-		});
-		setUpdating(false);
-	}; 
-
 	
 	useEffect(() => {
 		if (error) alert(error);
 	}, [error]);
 
 	return (
-		<form className='space-y-6 px-6 pb-4' onSubmit={handleSubmitGoalDigger}>
+		<form className='space-y-6 px-6 pb-4' onSubmit={handleSubmitVictoryTracker}>
 			<h3 className='text-xl font-medium text-white'>Victory Tracker Form</h3>
 			<div>
-				<p>Date</p>
-				<input
-                    onChange={handleChangeInput}
-					type='date'
-					name='date'
-					id='date'
-					className='
-        border-2 outline-none sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
-        bg-gray-600 border-gray-500 placeholder-gray-400 text-white
-    '
-					placeholder={todayDate}
-				/>
-			</div>
-			<div>
-				<p>Today`s Status</p>
 				<input
                     onChange={handleChangeInput}
 					type='statusUpdate'
@@ -108,11 +73,10 @@ const VictoryTracker: React.FC<VictoryTrackerProps> = () => {
         border-2 outline-none sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
         bg-gray-600 border-gray-500 placeholder-gray-400 text-white
     '
-					placeholder='I created navbar and login modal today.'
+					placeholder='Today`s Status'
 				/>
 			</div>
 			<div>
-				<p>No. of hours</p>
 				<input
                     onChange={handleChangeInput}
 					type='noOfHours'
@@ -122,20 +86,7 @@ const VictoryTracker: React.FC<VictoryTrackerProps> = () => {
         border-2 outline-none sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
         bg-gray-600 border-gray-500 placeholder-gray-400 text-white
     '
-					placeholder='2 hours spent on navbar and 3 hours spent on modal'
-				/>
-			</div>
-            <div>
-				<input
-                    onChange={handleChangeInput}
-					type='reasonToPursue'
-					name='reasonToPursue'
-					id='reasonToPursue'
-					className='
-        border-2 outline-none sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
-        bg-gray-600 border-gray-500 placeholder-gray-400 text-white
-    '
-					placeholder='Why Do you want to pursue?'
+					placeholder='No. of hours spent'
 				/>
 			</div>
 

@@ -1,16 +1,16 @@
 import { atom } from "recoil";
 
-type LearnModalState = {
+type MonthlyProgressModalState = {
 	isOpen: boolean;
 	type: "goalDigger" | "victoryTracker" | "monthlyProgress";
 };
 
-const initalLearnModalState: LearnModalState = {
+const initialMonthlyProgressModalState: MonthlyProgressModalState = {
 	isOpen: false,
 	type: "monthlyProgress",
 };
 
-export const learnModalState = atom<LearnModalState>({
-	key: "learnModalState",
-	default: initalLearnModalState,
+export const monthlyProgressModalState = atom<MonthlyProgressModalState>({
+	key: "monthlyProgressModalState",
+	default: initialMonthlyProgressModalState,
 });
